@@ -10,4 +10,5 @@ try {
 } catch (PDOException $e) {
     die("DB Error: " . $e->getMessage());
 }
+date_default_timezone_set('Africa/Casablanca')
 ?>
