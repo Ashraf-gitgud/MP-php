@@ -26,24 +26,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         header("Location: ../index.php");
         exit;
     }else{
-        $error = "Invalid username or password";
+        $error = "Nom d'utilisateur ou mot de passe invalide";
     }
 }
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<link rel="stylesheet" href="../styles/style.css">
 </head>
 <body>
-<h2>Login</h2>
-<?php if (isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
-<form method="POST">
-    <input type="text" name="usr" placeholder="Username" required>
-    <input type="password" name="pw" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>
+<div class="login-container">
+    <h2 class="form-title" style="border:none">Connexion</h2>
+
+    <?php if (isset($error)): ?>
+        <p class="form-error"><?= $error ?></p>
+    <?php endif; ?>
+
+    <form class="form-card" method="POST">
+        <div class="form-group">
+            <input class="form-input" type="text" name="usr" placeholder="Nom d'utilisateur" required>
+        </div>
+        <div class="form-group">
+            <input class="form-input" type="password" name="pw" placeholder="Mot de passe" required>
+        </div>
+        <button class="form-btn" type="submit">Se connecter</button>
+    </form>
+</div>
 </body>
 </html>

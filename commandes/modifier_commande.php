@@ -1,6 +1,5 @@
 <?php
 require '../db/base.php';
-
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../connexion/login.php");
@@ -77,27 +76,79 @@ $order = $stmt->fetch(PDO::FETCH_ASSOC);
 $clients = $pdo->query("SELECT code_client, nom, prenom FROM clients ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);
 $produits = $pdo->query("SELECT id, nom, stock FROM produits ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);
 ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panneau d'administration</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+    <h1><a href="../index.php" class="header-link">Panneau d'administration</a></h1>
+    
+     <nav class="navbar">
+        <div class="nav-left">
+            <div class="dropdown">
+                <button class="dropbtn">Clients ▼</button>
+                <div class="dropdown-content">
+                    <a href="../clients/liste_clients.php"> Liste des clients</a>
+                    <a href="../clients/ajouter_client.php"> Ajouter un client</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Produits ▼</button>
+                <div class="dropdown-content">
+                    <a href="../produits/liste_produits.php">Liste des produits</a>
+                    <a href="../produits/ajouter_produit.php"> Ajouter un produit</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Commandes ▼</button>
+                <div class="dropdown-content">
+                    <a href="liste_commandes.php"> Liste des commandes</a>
+                    <a href="ajouter_commande.php"> Nouvelle commande</a>
+                </div>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="../connexion/logout.php" class="power-btn">Déconnexion</a>
+        </div>
+    </nav>
+    <h2 class="form-title">Modifier Commande</h2>
+    <form class="form-card" method="post">
+        <div class="form-group">
+            <label>Client:</label>
+            <select class="form-input" name="code_client" required>
+                <option value="">--Sélectionner--</option>
+                <?php foreach ($clients as $c): 
+                    $sel = ($c['code_client'] == $order['code_client']) ? 'selected' : '';
+                ?>
+                    <option value="<?= $c['code_client'] ?>" <?= $sel ?>><?= $c['nom'] ?> <?= $c['prenom'] ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-<h2>Modifier commande</h2>
-<form method="post">
-    Client: 
-    <select name="code_client" required>
-        <option value="">--Sélectionner--</option>
-        <?php foreach ($clients as $c) {
-            $sel = ($c['code_client'] == $order['code_client']) ? 'selected' : '';
-            echo '<option value="'.$c['code_client'].'" '.$sel.'>'.$c['nom'].' '.$c['prenom'].'</option>';
-        } ?>
-    </select><br>
+        <div class="form-group">
+            <label>Produit:</label>
+            <select class="form-input" name="produit_id" required>
+                <option value="">--Sélectionner--</option>
+                <?php foreach ($produits as $p): 
+                    $sel = ($p['nom'] == $order['nom']) ? 'selected' : '';
+                ?>
+                    <option value="<?= $p['id'] ?>" <?= $sel ?>><?= $p['nom'] ?> (Stock: <?= $p['stock'] ?>)</option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-    Produit: 
-    <select name="produit_id" required>
-        <option value="">--Sélectionner--</option>
-        <?php foreach ($produits as $p) {
-            $sel = ($p['nom'] == $order['nom']) ? 'selected' : '';
-            echo '<option value="'.$p['id'].'" '.$sel.'>'.$p['nom'].' (Stock: '.$p['stock'].')</option>';
-        } ?>
-    </select><br>
+        <div class="form-group">
+            <label>Quantité: </label>
+            <input class="form-input" type="number" name="qty" value="<?= $order['qty'] ?>" min="1" required>
+        </div>
 
-    Quantité: <input type="number" name="qty" value="<?= $order['qty'] ?>" min="1" required><br>
-    <button type="submit">Mettre à jour</button>
-</form>
+        <button class="form-btn" type="submit">Mettre à jour</button>
+        <a href="../index.php" class="table-btn delete-btn" type="submit">Annuler</a>
+    </form>
+
+</body>
+</html>

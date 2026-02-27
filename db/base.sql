@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS clients (
 
 CREATE TABLE IF NOT EXISTS produits (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
+    nom VARCHAR(100) NOT NULL UNIQUE,
     descr TEXT,
     prix DECIMAL(10,2) NOT NULL CHECK (prix > 0),
     stock INT NOT NULL CHECK (stock >= 0)

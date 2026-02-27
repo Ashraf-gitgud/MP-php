@@ -6,33 +6,33 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-$code = isset($_GET['code_client']) ? $_GET['code_client'] : '';
-if (!$code) { echo "Client non spécifié."; exit; }
+$id = isset($_GET['id']) ? $_GET['id'] : '';
+if (!$id) { echo "Produit non spécifié."; exit; }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom    = isset($_POST['nom']) ? trim($_POST['nom']) : '';
-    $prenom = isset($_POST['prenom']) ? trim($_POST['prenom']) : '';
-    $email  = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $tele   = isset($_POST['tele']) ? trim($_POST['tele']) : '';
+    $nom   = isset($_POST['nom']) ? trim($_POST['nom']) : '';
+    $descr = isset($_POST['descr']) ? trim($_POST['descr']) : '';
+    $prix  = isset($_POST['prix']) ? trim($_POST['prix']) : '';
+    $stock = isset($_POST['stock']) ? trim($_POST['stock']) : '';
 
-    if ($nom && $prenom && $email) {
+    if ($nom && $prix && $stock !== '') {
         $stmt = $pdo->prepare("
-            UPDATE clients 
-            SET nom = ?, prenom = ?, email = ?, tele = ?
-            WHERE code_client = ?
+            UPDATE produits 
+            SET nom = ?, descr = ?, prix = ?, stock = ?
+            WHERE id = ?
         ");
-        $stmt->execute([$nom, $prenom, $email, $tele, $code]);
-        header("Location: liste_clients.php");
+        $stmt->execute([$nom, $descr, $prix, $stock, $id]);
+        header("Location: liste_produits.php");
         exit;
     } else {
         echo "Tous les champs obligatoires doivent être remplis.";
     }
 }
 
-$stmt = $pdo->prepare("SELECT * FROM clients WHERE code_client = ?");
-$stmt->execute([$code]);
-$client = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$client) { echo "Client introuvable."; exit; }
+$stmt = $pdo->prepare("SELECT * FROM produits WHERE id = ?");
+$stmt->execute([$id]);
+$prod = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$prod) { echo "Produit introuvable."; exit; }
 ?>
 
 <!DOCTYPE html>
@@ -51,15 +51,15 @@ if (!$client) { echo "Client introuvable."; exit; }
             <div class="dropdown">
                 <button class="dropbtn">Clients ▼</button>
                 <div class="dropdown-content">
-                    <a href="liste_clients.php"> Liste des clients</a>
-                    <a href="ajouter_client.php"> Ajouter un client</a>
+                    <a href="../clients/liste_clients.php"> Liste des clients</a>
+                    <a href="../clients/ajouter_client.php"> Ajouter un client</a>
                 </div>
             </div>
             <div class="dropdown">
                 <button class="dropbtn">Produits ▼</button>
                 <div class="dropdown-content">
-                    <a href="../produits/liste_produits.php">Liste des produits</a>
-                    <a href="../produits/ajouter_produit.php"> Ajouter un produit</a>
+                    <a href="liste_produits.php">Liste des produits</a>
+                    <a href="ajouter_produit.php"> Ajouter un produit</a>
                 </div>
             </div>
             <div class="dropdown">
@@ -74,23 +74,23 @@ if (!$client) { echo "Client introuvable."; exit; }
             <a href="../connexion/logout.php" class="power-btn">Déconnexion</a>
         </div>
     </nav>
-    <h2 class="form-title">Modifier Client</h2>
+    <h2 class="form-title">Modifier Produit</h2>
     <form class="form-card" method="post">
         <div class="form-group">
             <label>Nom:</label>
-            <input class="form-input" type="text" name="nom" value="<?= $client['nom'] ?>" required>
+            <input class="form-input" type="text" name="nom" value="<?= $prod['nom'] ?>" required>
         </div>
         <div class="form-group">
-            <label>Prénom:</label>
-            <input class="form-input" type="text" name="prenom" value="<?= $client['prenom'] ?>" required>
+            <label>Description:</label>
+            <textarea class="form-input" name="descr"><?= $prod['descr'] ?></textarea>
         </div>
         <div class="form-group">
-            <label>Email:</label>
-            <input class="form-input" type="email" name="email" value="<?= $client['email'] ?>" required>
+            <label>Prix:</label>
+            <input class="form-input" type="number" step="0.01" name="prix" value="<?= $prod['prix'] ?>" required>
         </div>
         <div class="form-group">
-            <label>Téléphone:</label>
-            <input class="form-input" type="text" name="tele" value="<?= $client['tele'] ?>">
+            <label>Stock:</label>
+            <input class="form-input" type="number" name="stock" value="<?= $prod['stock'] ?>" required>
         </div>
         <button class="form-btn" type="submit">Mettre à jour</button>
         <a href="../index.php" class="table-btn delete-btn" type="submit">Annuler</a>
