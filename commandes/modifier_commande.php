@@ -78,26 +78,74 @@ $clients = $pdo->query("SELECT code_client, nom, prenom FROM clients ORDER BY no
 $produits = $pdo->query("SELECT id, nom, stock FROM produits ORDER BY nom")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<h2>Modifier commande</h2>
-<form method="post">
-    Client: 
-    <select name="code_client" required>
-        <option value="">--Sélectionner--</option>
-        <?php foreach ($clients as $c) {
-            $sel = ($c['code_client'] == $order['code_client']) ? 'selected' : '';
-            echo '<option value="'.$c['code_client'].'" '.$sel.'>'.$c['nom'].' '.$c['prenom'].'</option>';
-        } ?>
-    </select><br>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier commande</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="dropdown">
+                <button class="dropbtn">Clients ▼</button>
+                <div class="dropdown-content">
+                    <a href="clients-liste.php">📋 Liste des clients</a>
+                    <a href="clients-ajouter.php">➕ Ajouter un client</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Produits ▼</button>
+                <div class="dropdown-content">
+                    <a href="produits-liste.php">📋 Liste des produits</a>
+                    <a href="produits-ajouter.php">➕ Ajouter un produit</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Commandes ▼</button>
+                <div class="dropdown-content">
+                    <a href="commandes-liste.php">📋 Liste des commandes</a>
+                    <a href="commandes-nouvelle.php">➕ Nouvelle commande</a>
+                </div>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="../deconnexion.php" class="power-btn">⏻ Déconnexion</a>
+        </div>
+    </nav>
 
-    Produit: 
-    <select name="produit_id" required>
-        <option value="">--Sélectionner--</option>
-        <?php foreach ($produits as $p) {
-            $sel = ($p['nom'] == $order['nom']) ? 'selected' : '';
-            echo '<option value="'.$p['id'].'" '.$sel.'>'.$p['nom'].' (Stock: '.$p['stock'].')</option>';
-        } ?>
-    </select><br>
+    <div class="content">
+        <h2>Modifier commande</h2>
+        <form method="post">
+            <label>Client:</label>
+            <select name="code_client" required>
+                <option value="">--Sélectionner--</option>
+                <?php foreach ($clients as $c): 
+                    $sel = ($c['code_client'] == $order['code_client']) ? 'selected' : ''; ?>
+                    <option value="<?= $c['code_client'] ?>" <?= $sel ?>>
+                        <?= $c['nom'] ?> <?= $c['prenom'] ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
 
-    Quantité: <input type="number" name="qty" value="<?= $order['qty'] ?>" min="1" required><br>
-    <button type="submit">Mettre à jour</button>
-</form>
+            <label>Produit:</label>
+            <select name="produit_id" required>
+                <option value="">--Sélectionner--</option>
+                <?php foreach ($produits as $p): 
+                    $sel = ($p['nom'] == $order['nom']) ? 'selected' : ''; ?>
+                    <option value="<?= $p['id'] ?>" <?= $sel ?>>
+                        <?= $p['nom'] ?> (Stock: <?= $p['stock'] ?>)
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <label>Quantité:</label>
+            <input type="number" name="qty" value="<?= $order['qty'] ?>" min="1" required>
+            
+            <button type="submit">Mettre à jour</button>
+        </form>
+    </div>
+</body>
+</html>

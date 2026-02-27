@@ -35,11 +35,61 @@ $client = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$client) { echo "Client introuvable."; exit; }
 ?>
 
-<h2>Modifier Client</h2>
-<form method="post">
-    Nom: <input type="text" name="nom" value="<?= $client['nom'] ?>" required><br>
-    Prénom: <input type="text" name="prenom" value="<?= $client['prenom'] ?>" required><br>
-    Email: <input type="email" name="email" value="<?= $client['email'] ?>" required><br>
-    Téléphone: <input type="text" name="tele" value="<?= $client['tele'] ?>"><br>
-    <button type="submit">Mettre à jour</button>
-</form>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier client</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="dropdown">
+                <button class="dropbtn">Clients ▼</button>
+                <div class="dropdown-content">
+                    <a href="clients-liste.php">📋 Liste des clients</a>
+                    <a href="clients-ajouter.php">➕ Ajouter un client</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Produits ▼</button>
+                <div class="dropdown-content">
+                    <a href="produits-liste.php">📋 Liste des produits</a>
+                    <a href="produits-ajouter.php">➕ Ajouter un produit</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button class="dropbtn">Commandes ▼</button>
+                <div class="dropdown-content">
+                    <a href="commandes-liste.php">📋 Liste des commandes</a>
+                    <a href="commandes-nouvelle.php">➕ Nouvelle commande</a>
+                </div>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="../deconnexion.php" class="power-btn">⏻ Déconnexion</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h2>Modifier Client</h2>
+        <form method="post">
+            <label>Nom:</label>
+            <input type="text" name="nom" value="<?= $client['nom'] ?>" required>
+            
+            <label>Prénom:</label>
+            <input type="text" name="prenom" value="<?= $client['prenom'] ?>" required>
+            
+            <label>Email:</label>
+            <input type="email" name="email" value="<?= $client['email'] ?>" required>
+            
+            <label>Téléphone:</label>
+            <input type="text" name="tele" value="<?= $client['tele'] ?>">
+            
+            <button type="submit">Mettre à jour</button>
+        </form>
+    </div>
+</body>
+</html>
