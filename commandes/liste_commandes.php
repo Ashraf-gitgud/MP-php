@@ -15,16 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
         $stmt = $pdo->prepare("UPDATE produits SET stock = stock + ? WHERE nom = ?");
         $stmt->execute([$order['qty'], $order['nom']]);
         $dt = strtotime($order['date_commande']);
-        $filename = 'facture/commande_'.date('dmY&His', $dt).'.txt';
+        $filename = 'facture/commande_'.date('dmY&His', $dt).'.txt';        
+        $stmt = $pdo->prepare("DELETE FROM commandes WHERE id = ?");
+        $stmt->execute([$_POST['delete_id']]);
+        header("Location: liste_commandes.php");
+        exit;
         if (file_exists($filename)) {
             unlink($filename);
         }
+
     }
 
-    $stmt = $pdo->prepare("DELETE FROM commandes WHERE id = ?");
-    $stmt->execute([$_POST['delete_id']]);
-    header("Location: liste_commandes.php");
-    exit;
 }
 
 $search = isset($_GET['q']) ? trim($_GET['q']) : '';

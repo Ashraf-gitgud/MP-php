@@ -14,7 +14,7 @@ $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $code_client = $_POST['code_client'] ?? '';
     $produit_id  = $_POST['produit_id'] ?? '';
-    $qty         = (int)($_POST['qty'] ?? 0);
+    $qty         = ($_POST['qty'] ?? 0);
 
     if ($code_client && $produit_id && $qty > 0) {
 

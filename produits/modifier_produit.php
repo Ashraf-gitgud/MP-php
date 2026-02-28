@@ -7,7 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 $id = isset($_GET['id']) ? $_GET['id'] : '';
-if (!$id) { echo "Produit non spécifié."; exit; }
+if (!$id) { $message = "Produit non spécifié."; exit; }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom   = isset($_POST['nom']) ? trim($_POST['nom']) : '';
@@ -21,11 +21,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             SET nom = ?, descr = ?, prix = ?, stock = ?
             WHERE id = ?
         ");
+        try{
         $stmt->execute([$nom, $descr, $prix, $stock, $id]);
         header("Location: liste_produits.php");
         exit;
+        }catch(PDOException $e){
+        $message = "Un erreur est survenue";
+        }
     } else {
-        echo "Tous les champs obligatoires doivent être remplis.";
+        $message = "Tous les champs obligatoires doivent être remplis.";
     }
 }
 
@@ -74,8 +78,11 @@ if (!$prod) { echo "Produit introuvable."; exit; }
             <a href="../connexion/logout.php" class="power-btn">Déconnexion</a>
         </div>
     </nav>
-    <h2 class="form-title">Modifier Produit</h2>
     <form class="form-card" method="post">
+    <h2 class="form-title">Modifier Produit</h2>
+    <?php if (!empty($message)): ?>
+    <div class="form-message"><?= $message ?></div>
+    <?php endif; ?>
         <div class="form-group">
             <label>Nom:</label>
             <input class="form-input" type="text" name="nom" value="<?= $prod['nom'] ?>" required>

@@ -21,11 +21,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             SET nom = ?, prenom = ?, email = ?, tele = ?
             WHERE code_client = ?
         ");
+        try{
         $stmt->execute([$nom, $prenom, $email, $tele, $code]);
         header("Location: liste_clients.php");
         exit;
+        }catch(PDOException $e){
+        $message = "Un erreur est survenue";
+        }
     } else {
-        echo "Tous les champs obligatoires doivent être remplis.";
+        $message = "Un erreur est survenue";
     }
 }
 
@@ -74,8 +78,11 @@ if (!$client) { echo "Client introuvable."; exit; }
             <a href="../connexion/logout.php" class="power-btn">Déconnexion</a>
         </div>
     </nav>
-    <h2 class="form-title">Modifier Client</h2>
     <form class="form-card" method="post">
+    <h2 class="form-title">Modifier Client</h2>
+    <?php if (!empty($message)): ?>
+    <div class="form-message"><?= $message ?></div>
+    <?php endif; ?>
         <div class="form-group">
             <label>Nom:</label>
             <input class="form-input" type="text" name="nom" value="<?= $client['nom'] ?>" required>
