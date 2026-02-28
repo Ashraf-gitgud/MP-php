@@ -1,51 +1,53 @@
 <?php
 require '../db/base.php';
 session_start();
+
 if (!isset($_SESSION['user'])) {
     header("Location: ../connexion/login.php");
     exit;
 }
 
-$id = isset($_GET['id']) ? $_GET['id'] : '';
-if (!$id) { $message = "Commande non spécifiée."; }
+$id = $_GET['id'] ?? '';
+if (!$id) {
+    $message = "Commande non spécifiée.";
+}
 
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $code_client = $_POST['code_client'] ?? '';
     $produit_id  = $_POST['produit_id'] ?? '';
-    $qty         = ($_POST['qty'] ?? 0);
+    $qty         = $_POST['qty'] ?? 0;
 
     if ($code_client && $produit_id && $qty > 0) {
 
         $stmt = $pdo->prepare("SELECT * FROM commandes WHERE id = ?");
         $stmt->execute([$id]);
         $old = $stmt->fetch(PDO::FETCH_ASSOC);
- 
-        $stmt = $pdo->prepare("UPDATE produits SET stock = stock + ? WHERE nom = ?");
-        $stmt->execute([$old['qty'], $old['nom']]);
- 
+
         $stmt = $pdo->prepare("SELECT nom, prix, stock FROM produits WHERE id = ?");
         $stmt->execute([$produit_id]);
         $prod = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$prod) {
             $message = "Produit introuvable.";
-        } elseif ($qty > $prod['stock']) {
+        } elseif ($qty > $prod['stock'] + $old['qty']) {
             $message = "Stock insuffisant.";
         } else {
+            $stmt = $pdo->prepare("UPDATE produits SET stock = stock + ? WHERE nom = ?");
+            $stmt->execute([$old['qty'], $old['nom']]);
+
             $total = $prod['prix'] * $qty;
- 
             $stmt = $pdo->prepare("
                 UPDATE commandes
                 SET code_client = ?, nom = ?, prix = ?, qty = ?, total = ?
                 WHERE id = ?
             ");
             $stmt->execute([$code_client, $prod['nom'], $prod['prix'], $qty, $total, $id]);
- 
+
             $stmt = $pdo->prepare("UPDATE produits SET stock = stock - ? WHERE id = ?");
             $stmt->execute([$qty, $produit_id]);
- 
+
             $dt = strtotime($old['date_commande']);
             $filename = 'facture/commande_'.date('dmY&His', $dt).'.txt';
 
@@ -71,11 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $message = "Commande mise à jour.";
         }
-
     } else {
         $message = "Tous les champs sont obligatoires et quantité > 0.";
     }
-} 
+}
+
 $stmt = $pdo->prepare("SELECT * FROM commandes WHERE id = ?");
 $stmt->execute([$id]);
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -93,8 +95,8 @@ $produits = $pdo->query("SELECT id, nom, stock FROM produits ORDER BY nom")->fet
 </head>
 <body>
     <h1><a href="../index.php" class="header-link">Panneau d'administration</a></h1>
-    
-     <nav class="navbar">
+
+    <nav class="navbar">
         <div class="nav-left">
             <div class="dropdown">
                 <button class="dropbtn">Clients ▼</button>
@@ -122,10 +124,11 @@ $produits = $pdo->query("SELECT id, nom, stock FROM produits ORDER BY nom")->fet
             <a href="../connexion/logout.php" class="power-btn">Déconnexion</a>
         </div>
     </nav>
+
     <form class="form-card" method="post">
-    <h2 class="form-title">Modifier Commande</h2>
+        <h2 class="form-title">Modifier Commande</h2>
         <?php if (!empty($message)): ?>
-        <div class="form-message"><?= $message ?></div>
+            <div class="form-message"><?= $message ?></div>
         <?php endif; ?>
         <div class="form-group">
             <label>Client:</label>
@@ -157,8 +160,7 @@ $produits = $pdo->query("SELECT id, nom, stock FROM produits ORDER BY nom")->fet
         </div>
 
         <button class="form-btn" type="submit">Mettre à jour</button>
-        <a href="../index.php" class="table-btn delete-btn" type="submit">Annuler</a>
+        <a href="../index.php" class="table-btn delete-btn">Annuler</a>
     </form>
-
 </body>
 </html>
